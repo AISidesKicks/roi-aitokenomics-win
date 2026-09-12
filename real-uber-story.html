@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Uber's 4-Month AI Token Burn, Put in the Right Frame</title>
+<meta name="description" content="Uber burned its entire 2026 AI coding-tools budget in four months, then stabilized spend while usage grew 7x. A timeline-driven research page on what actually happened, from the January leaderboard to the August cost-equation teardown.">
+<style>
+  :root{
+    --bg:#0b0e13;
+    --panel:#121822;
+    --panel2:#0f141d;
+    --line:#232c3a;
+    --text:#d8dfe9;
+    --muted:#8d99ab;
+    --amber:#f2a33c;
+    --amber-dim:rgba(242,163,60,.14);
+    --green:#3ecf8e;
+    --green-dim:rgba(62,207,142,.12);
+    --blue:#6cb0ff;
+    --red:#ff6b6b;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  main{max-width:940px;margin:0 auto;padding:0 24px 80px}
+  a{color:var(--blue);text-decoration:none;border-bottom:1px solid rgba(108,176,255,.35)}
+  a:hover{border-bottom-color:var(--blue)}
+  code,.mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace}
+  h2{
+    font-size:1.45rem;line-height:1.3;margin:72px 0 20px;
+    padding-top:8px;
+  }
+  h2 .no{
+    color:var(--amber);font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:1rem;margin-right:10px;font-weight:600;
+  }
+  h3{font-size:1.05rem;margin:26px 0 10px;color:var(--text)}
+  p{margin:0 0 16px}
+  p.lede{color:var(--muted)}
+  strong{color:#f0f4fa}
+
+  /* Hero */
+  .hero{padding-top:72px}
+  .kicker{
+    color:var(--amber);text-transform:uppercase;letter-spacing:.18em;
+    font-size:.72rem;font-weight:700;margin-bottom:18px;
+  }
+  h1{
+    font-size:clamp(1.9rem,4.6vw,2.9rem);line-height:1.18;letter-spacing:-.01em;
+    margin-bottom:20px;font-weight:800;
+  }
+  .thesis{font-size:1.12rem;color:var(--muted);max-width:52rem;margin-bottom:26px}
+  .hero-meta{color:var(--muted);font-size:.85rem;margin-bottom:22px}
+  .badges{display:flex;flex-wrap:wrap;gap:8px}
+  .badges a{
+    font-size:.74rem;letter-spacing:.02em;color:var(--muted);
+    border:1px solid var(--line);border-radius:999px;padding:5px 12px;
+    background:var(--panel2);
+  }
+  .badges a:hover{color:var(--text);border-color:var(--muted)}
+
+  /* TL;DR */
+  .frame{
+    margin-top:36px;border:1px solid rgba(242,163,60,.4);border-radius:14px;
+    background:linear-gradient(180deg,var(--amber-dim),transparent 60%),var(--panel);
+    padding:26px 28px;
+  }
+  .frame h2{margin:0 0 16px;font-size:1.25rem}
+  .frame ol{margin:0;padding-left:1.2em;display:grid;gap:12px}
+  .frame li{margin:0}
+
+  /* Stat grid */
+  .statgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin:22px 0}
+  .stat{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:16px 16px 13px;
+  }
+  .stat .num{font-size:1.5rem;font-weight:700;color:var(--amber);letter-spacing:-.01em}
+  .stat .num.good{color:var(--green)}
+  .stat .lbl{font-size:.78rem;color:var(--muted);margin-top:4px;line-height:1.45}
+
+  /* Timeline */
+  .timeline{list-style:none;border-left:2px solid var(--line);margin:24px 0 0 6px;padding:0}
+  .timeline li{position:relative;padding:0 0 30px 26px}
+  .timeline li:last-child{padding-bottom:6px}
+  .timeline li::before{
+    content:"";position:absolute;left:-7px;top:7px;width:12px;height:12px;
+    border-radius:50%;background:var(--bg);border:2px solid var(--amber);
+  }
+  .timeline li.resolved::before{border-color:var(--green)}
+  .tdate{
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    color:var(--amber);font-size:.82rem;font-weight:700;letter-spacing:.04em;
+  }
+  .timeline li.resolved .tdate{color:var(--green)}
+  .ttitle{font-weight:700;margin:2px 0 4px}
+  .timeline p{margin:0;color:var(--muted);font-size:.95rem}
+  .timeline p a{color:var(--blue)}
+
+  /* Cards */
+  .grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:20px 0}
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px;
+  }
+  .card h4{font-size:.95rem;margin-bottom:8px}
+  .card p{font-size:.9rem;color:var(--muted);margin:0}
+
+  /* Quotes */
+  .qgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin:22px 0}
+  .qcard{
+    background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    padding:20px 22px 16px;position:relative;
+  }
+  .qcard .mark{
+    font-family:Georgia,serif;color:var(--amber);font-size:2.2rem;line-height:1;
+    display:block;height:18px;
+  }
+  .qcard blockquote{font-size:1rem;line-height:1.55;margin:6px 0 12px;color:var(--text)}
+  .qcard .who{font-weight:700;font-size:.9rem}
+  .qcard .role{font-size:.76rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+  .qcard .src{font-size:.76rem;margin-top:10px;color:var(--muted)}
+
+  /* Formula */
+  .formula{
+    background:var(--panel2);border:1px solid var(--line);border-radius:12px;
+    padding:18px 20px;margin:20px 0;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+    font-size:.95rem;color:var(--amber);text-align:center;line-height:1.9;
+  }
+  .ledger{width:100%;border-collapse:collapse;margin:18px 0;font-size:.92rem}
+  .ledger th{
+    text-align:left;font-size:.74rem;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--muted);padding:8px 12px;border-bottom:1px solid var(--line);
+  }
+  .ledger td{padding:10px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+  .ledger td:first-child{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--amber);white-space:nowrap}
+  .ledger td:last-child{color:var(--muted)}
+
+  /* Callout */
+  .callout{
+    border-left:3px solid var(--amber);background:var(--amber-dim);
+    border-radius:0 12px 12px 0;padding:20px 24px;margin:26px 0;
+  }
+  .callout.good{border-left-color:var(--green);background:var(--green-dim)}
+  .callout h4{margin-bottom:8px}
+  .callout p{margin:0 0 10px;font-size:.96rem}
+  .callout p:last-child{margin-bottom:0}
+
+  /* Contrast strip */
+  .strip{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px;margin:20px 0}
+  .strip .card{border-left:3px solid var(--red)}
+
+  /* Sources */
+  .sources{list-style:none;counter-reset:src;margin:20px 0;padding:0}
+  .sources li{
+    counter-increment:src;padding:12px 0 12px 44px;position:relative;
+    border-bottom:1px solid var(--line);font-size:.94rem;color:var(--muted);
+  }
+  .sources li::before{
+    content:counter(src,decimal-leading-zero);position:absolute;left:4px;top:14px;
+    font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;color:var(--amber);font-size:.82rem;
+  }
+  .sources .note{display:block;font-size:.8rem;color:var(--muted);margin-top:2px}
+
+  footer{
+    margin-top:72px;padding-top:20px;border-top:1px solid var(--line);
+    color:var(--muted);font-size:.8rem;
+  }
+  @media (max-width:640px){
+    .hero{padding-top:48px}
+    h2{margin-top:56px}
+  }
+</style>
+</head>
+<body>
+<main>
+
+  <header class="hero">
+    <div class="kicker">AI Tokenomics &middot; Field Report</div>
+    <h1>Uber burned its entire 2026 AI coding budget in four months. That is not the story.</h1>
+    <p class="thesis">The right frame: agent adoption outran measurement and optimization on one of the world&rsquo;s most complex internal infrastructures &mdash; an in-house &ldquo;internal AWS&rdquo; Uber ran for a decade. Uber&rsquo;s own engineers report total spend <strong>&ldquo;relatively stabilized since April&rdquo;</strong> &mdash; the same month the budget ran dry &mdash; while usage grew 7&times;.</p>
+    <p class="hero-meta">Published September 2026 &middot; A case study for the AI Tokenomics thesis: moving from simplistic token counting to per-task cost and scaling projections.</p>
+    <nav class="badges" aria-label="Primary sources">
+      <a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>
+      <a href="https://www.youtube.com/watch?v=y_mQ6xLcKyc">Rapid Response (video)</a>
+      <a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a>
+      <a href="https://newsletter.pragmaticengineer.com/p/uber-move-to-cloud">PE &middot; Move to Cloud</a>
+      <a href="https://newsletter.pragmaticengineer.com/p/program-platform-split-uber">PE &middot; Program/Platform</a>
+      <a href="https://www.youtube.com/watch?v=i1tZN41VKcE">Pragmatic Summit (video)</a>
+      <a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer</a>
+      <a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>
+    </nav>
+  </header>
+
+  <section class="frame" id="frame" aria-labelledby="frame-h">
+    <h2 id="frame-h"><span class="no">&sect;0</span>The right frame</h2>
+    <ol>
+      <li><strong>What happened:</strong> Fortune reported on May 26, 2026 that Uber burned through its entire 2026 budget for AI coding tools in roughly four months &mdash; after leadership encouraged adoption by ranking teams on an internal leaderboard of total AI tool usage (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>).</li>
+      <li><strong>Why it is not an &ldquo;AI waste&rdquo; story:</strong> the burn is what happens when adoption outruns measurement. Uber&rsquo;s president and COO Andrew Macdonald conceded the link between usage and outcomes &mdash; like &ldquo;producing like 25% more useful consumer features&rdquo; &mdash; is &ldquo;not there yet&rdquo; (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>, <a href="https://www.youtube.com/watch?v=y_mQ6xLcKyc">Rapid Response</a>). The problem was attribution, not affordability.</li>
+      <li><strong>Why Uber burns tokens like few others:</strong> a decade of self-run infrastructure (own data centers, in-house Schemaless storage, thousands of microservices), hundreds of millions of lines of code, 50&ndash;70K tokens of MCP schema overhead per session, and engineers running 3&ndash;5 agents in parallel (<a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a>).</li>
+      <li><strong>How it resolved:</strong> on August 27, 2026 Uber&rsquo;s Distinguished Engineer reported weekly active users up 7&times; and requests up 9.4&times; (Feb&ndash;Aug) while total spend has been &ldquo;relatively stabilized since April&rdquo;; cost per 1,000 requests down ~34% from peak, cost per session down 52% &mdash; &ldquo;also a tractable engineering challenge&rdquo; (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</li>
+    </ol>
+  </section>
+
+  <h2 id="timeline"><span class="no">01</span>The timeline is the story</h2>
+  <p class="lede">Four months of burn, then three months of repair. Watch April: two documents, written four months apart, point at the same month from opposite sides of the finance desk.</p>
+  <ol class="timeline">
+    <li>
+      <div class="tdate">January 2026</div>
+      <div class="ttitle">The leaderboard surge</div>
+      <p>Uber encourages AI adoption by ranking teams on an internal leaderboard by total AI tool usage. Teams optimize the metric &mdash; and usage takes off (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>).</p>
+    </li>
+    <li>
+      <div class="tdate">March 10, 2026</div>
+      <div class="ttitle">The data lands</div>
+      <p>The Pragmatic Engineer publishes its deep dive into Uber&rsquo;s AI development: 84% of developers are agentic users, 65&ndash;72% of IDE code is AI-generated, Claude Code usage jumped 32% &rarr; 63% between December and February, agents open 11% of PRs, and AI costs are <strong>6&times; since 2024</strong> (<a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a>).</p>
+    </li>
+    <li>
+      <div class="tdate">&asymp; April 2026</div>
+      <div class="ttitle">The budget runs dry &mdash; and, quietly, the spend stabilizes</div>
+      <p>Fortune later reports the entire 2026 AI coding-tools budget was exhausted after about four months (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>). Keep this month in mind: Uber&rsquo;s own engineering blog will later say total AI spend has been &ldquo;relatively stabilized since April&rdquo; (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</p>
+    </li>
+    <li>
+      <div class="tdate">May 26, 2026</div>
+      <div class="ttitle">Fortune files the story; the COO concedes the gap</div>
+      <p>President and COO Andrew Macdonald, on the Rapid Response podcast: &ldquo;That link is not there yet&rdquo; between usage and business outcomes (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>, <a href="https://www.youtube.com/watch?v=y_mQ6xLcKyc">video</a>).</p>
+    </li>
+    <li>
+      <div class="tdate">June 2026</div>
+      <div class="ttitle">The engineering post-mortem</div>
+      <p>Uber&rsquo;s developer-platform team presents at the Pragmatic Summit: &ldquo;70% of workloads pushed in were toil&rdquo;, &ldquo;4 VPs landed code in 24 minutes&rdquo;, the CFO &ldquo;wants revenue impact rather than diff counts&rdquo;, and the pattern of &ldquo;plans through expensive models, execution through cheap ones&rdquo; (<a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer</a>, <a href="https://www.youtube.com/watch?v=i1tZN41VKcE">video</a>).</p>
+    </li>
+    <li class="resolved">
+      <div class="tdate">August 27, 2026</div>
+      <div class="ttitle">Uber&rsquo;s own account: stabilized since April, unit costs falling</div>
+      <p>Distinguished Engineer Uday Kiran Medisetty reports WAU up 7&times; and weekly agent requests up 9.4&times; from February to August, while total AI spend has been &ldquo;relatively stabilized since April&rdquo;; with the model held constant, cost per 1,000 requests is down almost 34% from its peak and cost per session down 52% from its June peak (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</p>
+    </li>
+    <li class="resolved">
+      <div class="tdate">September 2026</div>
+      <div class="ttitle">Reading the two Aprils</div>
+      <p>Finance saw the budget die in April. Engineering stabilized spend in April, then spent the summer pushing unit costs down while usage multiplied. Same month, same event, two offices &mdash; that coincidence is the whole story (this page).</p>
+    </li>
+  </ol>
+
+  <h2 id="burn"><span class="no">02</span>The burn</h2>
+  <p>Uber burned through its entire 2026 budget for AI coding tools in roughly four months, Fortune reported &mdash; after incentivizing adoption with an internal leaderboard that ranked teams by total AI tool usage (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>). The leaderboard turned a measure into a target, and Goodhart&rsquo;s law did the rest: when a measure becomes a target, it stops being a good measure. Teams optimized usage; nobody had wired usage to value.</p>
+  <p>That attribution gap is exactly what Macdonald admitted. The question was whether Claude Code usage could be tied to concrete outcomes &mdash; &ldquo;producing like 25% more useful consumer features&rdquo; &mdash; and his answer on Rapid Response was: &ldquo;That link is not there yet&rdquo; (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>; <a href="https://www.youtube.com/watch?v=y_mQ6xLcKyc">Rapid Response video</a>).</p>
+
+  <div class="statgrid">
+    <div class="stat"><div class="num">4 mo</div><div class="lbl">for the entire 2026 AI coding-tools budget to be exhausted <a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">[F]</a></div></div>
+    <div class="stat"><div class="num">6&times;</div><div class="lbl">growth in Uber&rsquo;s AI costs since 2024 <a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">[PE]</a></div></div>
+    <div class="stat"><div class="num">$207B</div><div class="lbl">Gartner&rsquo;s 2026 AI-agent spending forecast, +139% from $86.4B in 2025 <a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">[F]</a></div></div>
+    <div class="stat"><div class="num">$951M</div><div class="lbl">Uber R&amp;D in Q1 2026 alone, +17% YoY &mdash; the token budget is small against it <a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">[F]</a></div></div>
+  </div>
+
+  <h3>The macro backdrop makes the panic look misplaced</h3>
+  <p>Fortune&rsquo;s framing sits on Gartner&rsquo;s numbers: AI-agent spending of $207B in 2026, up 139% from $86.4B in 2025; inference prices roughly 90% cheaper by 2030; and agentic workflows that need far more tokens per task than chat ever did. Sam Altman&rsquo;s framing of intelligence as a metered utility is becoming the industry&rsquo;s mental model, and Anthropic&rsquo;s shift toward usage-based pricing pushed metered costs onto every enterprise bill (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>).</p>
+  <p>Scale check: Uber spent $951M on R&amp;D in Q1 2026 alone (+17% YoY), with R&amp;D at about 3.4% of revenue in 2025 (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>). Against that denominator, the AI-tools budget was never the existential line item &mdash; the crisis was that nobody could attribute what the tokens bought.</p>
+  <div class="strip">
+    <div class="card"><h4>Microsoft cancels direct Claude Code licenses</h4><p>Microsoft discontinued employees&rsquo; direct Claude Code licenses, steering developers to its own Copilot CLI instead (<a href="https://www.theverge.com/tech/930447/microsoft-claude-code-discontinued-notepad">The Verge</a>) &mdash; the same quarter Uber&rsquo;s story broke.</p></div>
+    <div class="card"><h4>Duolingo walks back</h4><p>Duolingo walked back its AI-first messaging (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>) &mdash; adoption targets are easy to announce, hard to live with.</p></div>
+    <div class="card"><h4>The pattern</h4><p>Across 2026, the industry kept learning the same lesson in public: usage is not value, and a large token bill is not a results story (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>).</p></div>
+  </div>
+
+  <h2 id="internal-aws"><span class="no">03</span>The internal AWS &mdash; why Uber burns tokens like few others</h2>
+  <p>Uber is a token furnace because Uber is one of the world&rsquo;s most complex internal software estates &mdash; and for about nine years it ran that estate on hardware it owned itself.</p>
+
+  <div class="statgrid">
+    <div class="stat"><div class="num">~9 yrs</div><div class="lbl">running its own data centers (SJC 2014 &rarr; PHX 2019) before the Google Cloud deal <a href="https://newsletter.pragmaticengineer.com/p/uber-move-to-cloud">[PE]</a></div></div>
+    <div class="stat"><div class="num">30&ndash;40%</div><div class="lbl">of engineers on platform teams after the 2014 Program/Platform split &mdash; &ldquo;a massive investment&rdquo; <a href="https://newsletter.pragmaticengineer.com/p/program-platform-split-uber">[PE]</a></div></div>
+    <div class="stat"><div class="num">100s of M</div><div class="lbl">lines of code and thousands of tables that agents must navigate <a href="https://www.uber.com/blog/efficient-software-factory/">[Uber]</a></div></div>
+    <div class="stat"><div class="num">1,000+</div><div class="lbl">MCP servers behind Uber&rsquo;s internal gateway <a href="https://www.uber.com/blog/efficient-software-factory/">[Uber]</a></div></div>
+  </div>
+
+  <h3>A decade of self-run infrastructure</h3>
+  <p>Before its own data centers, Uber ran on Peak Hosting, where the vendor managed &ldquo;everything but your code&rdquo; on a fleet that started at about a dozen Dell PowerEdge servers. From 2014 (San Jose, SJC) through 2019 (Phoenix, PHX, with a Washington, DC site, DCA), Uber ran its own data centers with ODM hardware from Quanta, Wiwynn, and Foxconn, built in-house storage (Schemaless, its answer to Google Spanner) and its own BI stack (Dashbuilder, where a big company would have bought Looker), and glued together thousands of microservices with multi-zone and multi-region failovers. In February 2023, Thomas Kurian confirmed the Google Cloud deal, and Uber began the five-year &ldquo;Crane&rdquo; migration off its remaining data centers (<a href="https://newsletter.pragmaticengineer.com/p/uber-move-to-cloud">Pragmatic Engineer, Inside Uber&rsquo;s move to the Cloud</a>).</p>
+
+  <h3>The historical rhyme: platforms have always looked like waste</h3>
+  <p>In 2014, an internal reorg email from product chief Jeff Holden split Uber&rsquo;s engineering into 16 program teams and 11 platform teams, with 30&ndash;40% of engineers working on platforms &mdash; which the author calls &ldquo;a massive investment&rdquo; that business people instinctively resist (<a href="https://newsletter.pragmaticengineer.com/p/program-platform-split-uber">Pragmatic Engineer</a>). AI developer platforms in 2026 are the same fight one layer up: infrastructure spend that finance sees as overhead until the leverage shows up.</p>
+
+  <h3>Why a single agent session at Uber is expensive by construction</h3>
+  <ul>
+    <li><strong>The estate is enormous.</strong> Hundreds of millions of code lines and thousands of tables; the Uber blog notes agents &ldquo;spend most of their turns locating information rather than generating code&rdquo; (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</li>
+    <li><strong>Tool schemas are heavy.</strong> With 100+ tools installed, standard MCP pre-loading added roughly 50K&ndash;70K tokens of schema overhead to the initial prompt &mdash; re-sent on every context turn &mdash; across a gateway with 1,000+ servers (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</li>
+    <li><strong>Engineers multiply sessions.</strong> They run 3&ndash;5 agents in parallel; principal engineer Ty Smith&rsquo;s description of the workflow &mdash; &ldquo;coffee or browse Reddit&hellip; kick off another background agent&rdquo; &mdash; is a token multiplier in one sentence (<a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a>).</li>
+    <li><strong>Background agents ride Uber&rsquo;s own CI.</strong> The Minion background-agent system runs on Uber&rsquo;s CI with the monorepo pre-checked out; uReview does AI code review; Autocover generates about 5,000 tests a month; Shepherd drives the Java 21 migration (<a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a>; <a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer</a>).</li>
+    <li><strong>Grounding was missing.</strong> Uber&rsquo;s fix &mdash; the AI Context Graph, 24M nodes and 80M edges across 30+ internal systems &mdash; answers a grounded query in 38 seconds that took an ungrounded agent 20 minutes and three errors before giving a wrong answer (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</li>
+  </ul>
+
+  <h2 id="voices"><span class="no">03&frac12;</span>What the big guns said</h2>
+  <div class="qgrid">
+    <div class="qcard">
+      <span class="mark">&ldquo;</span>
+      <blockquote>That link is not there yet.</blockquote>
+      <div class="who">Andrew Macdonald &middot; President &amp; COO, Uber</div>
+      <div class="role">On drawing a line from Claude Code usage to outcomes like &ldquo;producing like 25% more useful consumer features&rdquo;</div>
+      <div class="src"><a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a> &middot; <a href="https://www.youtube.com/watch?v=y_mQ6xLcKyc">Rapid Response</a></div>
+    </div>
+    <div class="qcard">
+      <span class="mark">&ldquo;</span>
+      <blockquote>Employees with superpowers.</blockquote>
+      <div class="who">Dara Khosrowshahi &middot; CEO, Uber</div>
+      <div class="role">On earnings calls: roughly 10% of committed code is written by autonomous agents &mdash; the framing is augmentation, not headcount cuts</div>
+      <div class="src"><a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a></div>
+    </div>
+    <div class="qcard">
+      <span class="mark">&ldquo;</span>
+      <blockquote>Coffee or browse Reddit&hellip; kick off another background agent.</blockquote>
+      <div class="who">Ty Smith &middot; Principal Engineer, Uber</div>
+      <div class="role">Engineers routinely run 3&ndash;5 agents in parallel &mdash; the human side of the token multiplier</div>
+      <div class="src"><a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a></div>
+    </div>
+    <div class="qcard">
+      <span class="mark">&ldquo;</span>
+      <blockquote>Plans through expensive models, execution through cheap ones.</blockquote>
+      <div class="who">Anshu Chada &middot; Engineering Director, Dev Platform</div>
+      <div class="role">Model-tiering as cost strategy, from the Pragmatic Summit talk (as summarized by intentlayer)</div>
+      <div class="src"><a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer</a> &middot; <a href="https://www.youtube.com/watch?v=i1tZN41VKcE">Pragmatic Summit video</a></div>
+    </div>
+    <div class="qcard">
+      <span class="mark">&ldquo;</span>
+      <blockquote>Intelligence as a metered utility.</blockquote>
+      <div class="who">Sam Altman &middot; OpenAI</div>
+      <div class="role">The pay-per-token model the whole debate presupposes &mdash; reported in Fortune&rsquo;s piece on Uber</div>
+      <div class="src"><a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a></div>
+    </div>
+    <div class="qcard">
+      <span class="mark">&ldquo;</span>
+      <blockquote>$207B in 2026, +139% YoY.</blockquote>
+      <div class="who">Gartner &middot; via Fortune</div>
+      <div class="role">AI-agent spending forecast vs $86.4B in 2025 &mdash; and inference ~90% cheaper by 2030, even as agentic tasks need far more tokens</div>
+      <div class="src"><a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a></div>
+    </div>
+  </div>
+
+  <h2 id="ledger"><span class="no">04</span>The tokenomics ledger</h2>
+  <p class="lede">Uber&rsquo;s software-factory post does what this repo argues for: it stops counting tokens and starts decomposing spend into terms that can each be measured, owned, and optimized (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</p>
+
+  <div class="formula">total spend &nbsp;=&nbsp; users &times; sessions/user &times; turns/session &times; requests/turn &times; tokens/request &times; price/token</div>
+
+  <table class="ledger">
+    <thead><tr><th>Term</th><th>What it is</th><th>The lever Uber pulled</th></tr></thead>
+    <tbody>
+      <tr><td>users</td><td>Adoption &mdash; the term you want growing</td><td>WAU grew 7&times; Feb&rarr;Aug while total spend held flat (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber</a>)</td></tr>
+      <tr><td>sessions/user</td><td>Engagement per engineer</td><td>Adoption &amp; engagement &mdash; meant to keep growing; weekly agentic requests rose 9.4&times; Feb&rarr;Aug (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber</a>)</td></tr>
+      <tr><td>turns/session</td><td>How long sessions run</td><td>Automatic compaction at 400K tokens, even on 1M-context models; reasoning effort defaulted to Medium (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber</a>)</td></tr>
+      <tr><td>requests/turn</td><td>Agent self-work on top of the user&rsquo;s ask</td><td>AI Context Graph grounding (24M nodes / 80M edges); graph-grounded agents stop failing slowly (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber</a>)</td></tr>
+      <tr><td>tokens/request</td><td>Payload per model call</td><td>Code-mode batching of tool calls (55&ndash;100% token savings in measured queries); CLI-resolved MCP instead of 50&ndash;70K tokens of preloaded schemas; prompt-cache TTL tuning (cache reads at 0.1&times; input rate; writes 1.25&times; for 5-minute and 2&times; for 1-hour entries; Anthropic offers 5-min/1-hour TTLs, OpenAI 30 min) (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber</a>)</td></tr>
+      <tr><td>price/token</td><td>Vendor unit price</td><td>Benchmark-driven Pareto model selection; subagents defaulted to cheaper models (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber</a>)</td></tr>
+    </tbody>
+  </table>
+
+  <h3>Change the denominator, change the company</h3>
+  <p>The post&rsquo;s most important move is denominating cost in outcomes: managed agents are tracked by <strong>cost per merged PR</strong>, cost per review, cost per alert &mdash; not tokens consumed (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>). That matches what Uber&rsquo;s CFO reportedly wants &mdash; revenue impact rather than diff counts (<a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer</a>) &mdash; and it is exactly the shift this repo&rsquo;s thesis describes: from simplistic token counting to per-task cost and scaling projections.</p>
+  <p>And keep the R&amp;D lens: $951M of Q1 2026 R&amp;D, +17% YoY (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>). Any AI-tools bill that fits inside a rounding error of that number was never going to sink Uber. Not knowing what the bill bought was the actual emergency.</p>
+
+  <h2 id="resolution"><span class="no">05</span>How it resolved</h2>
+  <p>By late August 2026, Uber&rsquo;s own account of the same stack reads like a control systems report: more than 70% of pull requests attributed to local or cloud agents; 3,600+ agent skills built across the SDLC with 30K+ executions per day; WAU up 7&times; and weekly agent requests up 9.4&times; from February to August &mdash; while total AI spend has been &ldquo;relatively stabilized since April&rdquo; (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</p>
+
+  <div class="statgrid">
+    <div class="stat"><div class="num good">&minus;34%</div><div class="lbl">cost per 1,000 model requests from its peak (Feb&ndash;July, model held constant) <a href="https://www.uber.com/blog/efficient-software-factory/">[U]</a></div></div>
+    <div class="stat"><div class="num good">&minus;52%</div><div class="lbl">cost per session from its June peak <a href="https://www.uber.com/blog/efficient-software-factory/">[U]</a></div></div>
+    <div class="stat"><div class="num">7&times;</div><div class="lbl">weekly active users across agentic offerings, Feb&rarr;Aug 2026 <a href="https://www.uber.com/blog/efficient-software-factory/">[U]</a></div></div>
+    <div class="stat"><div class="num">9.4&times;</div><div class="lbl">weekly agentic requests, Feb&rarr;Aug 2026 <a href="https://www.uber.com/blog/efficient-software-factory/">[U]</a></div></div>
+    <div class="stat"><div class="num">&gt;70%</div><div class="lbl">of pull requests attributed to agents <a href="https://www.uber.com/blog/efficient-software-factory/">[U]</a></div></div>
+    <div class="stat"><div class="num">16</div><div class="lbl">cost anti-patterns flagged per session by the analysis dashboard <a href="https://www.uber.com/blog/efficient-software-factory/">[U]</a></div></div>
+  </div>
+
+  <p>The visibility layer is deliberately mundane: a live cost counter in the harness status line, a single shared spend tier across interactive harnesses, Slack nudges at 50/80/100% of expected spend, and a session-analysis dashboard that flags 16 anti-patterns with their dollar impact (<a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>). Meanwhile the workload mix explains why the spend was defensible all along: &ldquo;70% of workloads pushed in were toil&rdquo; &mdash; upgrades, migrations, bug fixes &mdash; meaning the boring work got cheap &mdash; and the summit summary reported &ldquo;4 VPs landed code in 24 minutes&rdquo; (<a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer</a>; <a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">Pragmatic Engineer</a>).</p>
+
+  <div class="callout" id="april">
+    <h4>The April coincidence, made explicit</h4>
+    <p>Fortune says the 2026 AI coding-tools budget was gone by roughly <strong>April</strong>. Uber&rsquo;s engineering blog says spend has been &ldquo;relatively stabilized since <strong>April</strong>&rdquo; (<a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune</a>; <a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering</a>).</p>
+    <p>Read together, the burn and the fix are the same event seen from two offices. Finance watched the budget die in April; engineering stabilized spend in April, then spent May&ndash;August driving cost per 1,000 requests down 34% and cost per session down 52% while usage grew 7&times;. The leaderboard found the ceiling; the platform team rebuilt the floor under it.</p>
+  </div>
+
+  <blockquote class="callout good">
+    <h4>The verdict, from the source</h4>
+    <p>&ldquo;Managing and curbing rising AI coding expenses is also a tractable engineering challenge.&rdquo; &mdash; Uday Kiran Medisetty, Distinguished Engineer, Uber (<a href="https://www.uber.com/blog/efficient-software-factory/">Running a Software Factory Efficiently at Uber Scale, Aug 27, 2026</a>)</p>
+    <p>Not a reason to stop spending. An engineering problem with a backlog, a dashboard, and a cost equation.</p>
+  </blockquote>
+
+  <h2 id="coda"><span class="no">06</span>Coda: more work, not less</h2>
+  <p>The economics here cut against both easy narratives. Agents did not eliminate engineering work at Uber &mdash; they created more of it: over 70% of PRs are now agent-attributed, engineers run 3&ndash;5 sessions in parallel, and 70% of agent-pushed workloads were toil that nobody had headcount for before. Adoption expanded the amount of engineering that happens; what changed is the accounting. Once spend is denominated per merged PR rather than per token, the &ldquo;budget crisis&rdquo; of April 2026 turns into an optimization backlog with a six-term equation attached.</p>
+  <p>That is the transferable lesson of this story, and the reason this page sits in the AI Tokenomics collection: the industry is moving from simplistic token counting to per-task cost and scaling projections &mdash; and the companies that figure that out first get to spend more, not less.</p>
+
+  <h2 id="sources"><span class="no">07</span>Sources</h2>
+  <ol class="sources">
+    <li><a href="https://fortune.com/2026/05/26/uber-coo-ai-spending-tokens-claude-code/">Fortune &mdash; Uber&rsquo;s COO on burning through its AI coding budget, the internal leaderboard, Macdonald and Khosrowshahi quotes, Gartner data, R&amp;D figures</a><span class="note">May 26, 2026</span></li>
+    <li><a href="https://www.youtube.com/watch?v=y_mQ6xLcKyc">Rapid Response &mdash; Andrew Macdonald interview (video)</a><span class="note">Source of &ldquo;That link is not there yet&rdquo;</span></li>
+    <li><a href="https://newsletter.pragmaticengineer.com/p/how-uber-uses-ai-for-development">The Pragmatic Engineer &mdash; How Uber uses AI for development</a><span class="note">March 10, 2026 &middot; 84% agentic devs, 6&times; costs, four-layer stack, MCP gateway, Minion/uReview/Autocover/Shepherd, Ty Smith</span></li>
+    <li><a href="https://newsletter.pragmaticengineer.com/p/uber-move-to-cloud">The Pragmatic Engineer &mdash; Inside Uber&rsquo;s move to the Cloud, Part 1</a><span class="note">March 2023 &middot; Peak Hosting, SJC/DCA/PHX, ODM hardware, Schemaless, Crane, Google Cloud deal</span></li>
+    <li><a href="https://newsletter.pragmaticengineer.com/p/program-platform-split-uber">The Pragmatic Engineer &mdash; The Program and Program/Platform split at Uber</a><span class="note">September 2021 &middot; 2014 reorg, 16 program / 11 platform teams, 30&ndash;40% of engineers</span></li>
+    <li><a href="https://www.youtube.com/watch?v=i1tZN41VKcE">Pragmatic Summit &mdash; Uber talk (video)</a><span class="note">June 2026</span></li>
+    <li><a href="https://intentlayer.to/p/uber-leading-engineering-through">intentlayer &mdash; summary of Uber&rsquo;s Pragmatic Summit talk</a><span class="note">&ldquo;70% of workloads pushed in were toil&rdquo;, &ldquo;4 VPs landed code in 24 minutes&rdquo;, CFO framing, model tiering</span></li>
+    <li><a href="https://www.uber.com/blog/efficient-software-factory/">Uber Engineering &mdash; Running a Software Factory Efficiently at Uber Scale (Uday Kiran Medisetty)</a><span class="note">August 27, 2026 &middot; stabilized since April, &minus;34%/&minus;52%, cost equation, Context Graph, levers</span></li>
+    <li><a href="https://www.uber.com/blog/engineering/">Uber Engineering blog (index)</a><span class="note">Used to locate the software-factory post</span></li>
+    <li><a href="https://www.theverge.com/tech/930447/microsoft-claude-code-discontinued-notepad">The Verge &mdash; Microsoft discontinues direct Claude Code licenses</a><span class="note">Contrast case &middot; Copilot CLI</span></li>
+  </ol>
+
+  <footer>
+    <p>Compiled September 2026. All quotes are verbatim from the linked sources; numbers are as reported there. Static single-file page &mdash; no scripts, no trackers, works offline.</p>
+  </footer>
+
+</main>
+</body>
+</html>
